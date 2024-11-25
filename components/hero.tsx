@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useTypewriter } from '@/hooks/useTypewriter'
 import { Upload, Compass } from 'lucide-react'
+import Link from 'next/link'
 
 export function Hero() {
   const { displayText, isTypingComplete } = useTypewriter("Elevate Your Gameplay with CFG Share!")
@@ -27,12 +28,6 @@ export function Hero() {
     }
   }
 
-  const handleSeeProsConfig = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
-    // Add logic to navigate to pros config page or open a modal
-    console.log('Navigate to pros config page')
-  }
-
   return (
     <div className="relative min-h-[100dvh] flex items-center justify-center pt-20 pb-32 md:pt-32 md:pb-40 container mx-auto px-4">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-orange-500 to-green-500 opacity-20" />
@@ -51,9 +46,11 @@ export function Hero() {
               <Upload className="w-5 h-5 mr-2" />
               Upload your CFG
             </Button>
-            <Button size="lg" className="bg-transparent text-white border border-white hover:bg-white hover:text-black" onClick={handleSeeProsConfig}>
-              <Compass className="w-5 h-5 mr-2" />
-              Explore public CFGs
+            <Button size="lg" className="bg-transparent text-white border border-white hover:bg-white hover:text-black" asChild>
+              <Link href="/explore">
+                <Compass className="w-5 h-5 mr-2" />
+                Explore public CFGs
+              </Link>
             </Button>
           </div>
         </div>
