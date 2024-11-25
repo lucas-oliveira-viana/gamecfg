@@ -53,7 +53,7 @@ export function Header() {
               GAME.CFG
             </Link>
             <nav>
-              <ul className="flex space-x-4">
+              <ul className="flex space-x-8">
                 <li>
                   <Link
                     href="/explore"

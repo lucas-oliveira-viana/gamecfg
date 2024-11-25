@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -18,6 +19,7 @@ export function ConfigUploaderHome() {
   const [showLink, setShowLink] = useState(false)
   const [tooltipOpen, setTooltipOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -78,6 +80,43 @@ export function ConfigUploaderHome() {
       })
     }
   }
+
+  const handleSteamLogin = () => {
+    if (configLink) {
+      localStorage.setItem('pendingConfigLink', configLink)
+    }
+    window.location.href = '/api/auth/steam'
+  }
+
+  useEffect(() => {
+    const linkConfig = async () => {
+      const pendingConfigLink = localStorage.getItem('pendingConfigLink')
+      if (user && pendingConfigLink) {
+        try {
+          const response = await fetch('/api/link-config', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({
+              configLink: pendingConfigLink,
+              userId: user.id
+            })
+          })
+          if (response.ok) {
+            localStorage.removeItem('pendingConfigLink')
+            router.push('/dashboard')
+          } else {
+            console.error('Failed to link config')
+          }
+        } catch (error) {
+          console.error('Error linking config:', error)
+        }
+      }
+    }
+    linkConfig()
+  }, [user, router])
 
   return (
     <Card className="mt-8 bg-black border-gray-700">
@@ -145,7 +184,7 @@ export function ConfigUploaderHome() {
                 </TooltipProvider>
               )}
               {!user && (
-                <Button className="w-full flex items-center justify-center space-x-2 bg-white hover:bg-gray-100 text-black">
+                <Button onClick={handleSteamLogin} className="w-full flex items-center justify-center space-x-2 bg-white hover:bg-gray-100 text-black">
                   <Image 
                     src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/steam-icon-Qdmya1DG25syk2fFWNZwdTWcNFkFeZ.png"
                     alt="Steam logo"

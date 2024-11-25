@@ -25,7 +25,7 @@ export async function GET() {
       file_name: cfg.file_name,
       link_identifier: cfg.link_identifier,
       created_at: cfg.created_at,
-      username: cfg.users.username,
+      username: cfg.users?.username || 'Anonymous',
     }));
 
     return NextResponse.json(formattedData);
