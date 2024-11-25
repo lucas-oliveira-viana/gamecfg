@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -8,38 +8,30 @@ import Image from 'next/image'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Settings } from 'lucide-react'
-
-type User = {
-  steamid: string;
-  username: string;
-  avatar?: string;
-}
+import { useUser } from '@/hooks/useUser'
 
 export function Header() {
-  const [user, setUser] = useState<User | null>(null)
+  const { user, login, logout } = useUser()
   const pathname = usePathname()
   const router = useRouter()
 
   useEffect(() => {
-    // Check if we're on the dashboard and have user info in the URL
     if (pathname === '/dashboard') {
       const params = new URLSearchParams(window.location.search)
-      const steamid = params.get('steamid')
-      const username = params.get('username')
-      if (steamid && username) {
-        setUser({ steamid, username })
-        // Remove the query parameters from the URL
+      const token = params.get('token')
+      if (token) {
+        login(token)
         window.history.replaceState({}, document.title, "/dashboard")
       }
     }
-  }, [pathname])
+  }, [pathname, login])
 
   const handleSteamLogin = () => {
     window.location.href = '/api/auth/steam'
   }
 
   const handleLogout = () => {
-    setUser(null)
+    logout()
     router.push('/')
   }
 
