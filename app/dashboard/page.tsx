@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useUser } from '@/hooks/useUser'
 import { CFGList } from '@/components/cfg-list'
+import { Loader2 } from 'lucide-react'
 
 export default function Dashboard() {
-  const { user } = useUser()
+  const { user, isLoading } = useUser()
   const [configInfo, setConfigInfo] = useState<string | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -70,6 +71,23 @@ export default function Dashboard() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex flex-col">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
+          <Card className="w-full max-w-md bg-black border-gray-700">
+            <CardContent className="flex flex-col items-center justify-center p-6">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
+              <p className="mt-4 text-lg text-center">Loading your dashboard...</p>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       <Header />
@@ -96,7 +114,7 @@ export default function Dashboard() {
                         id="config-upload"
                         ref={fileInputRef}
                       />
-                      <Button variant="default" className="mx-auto" onClick={handleButtonClick}>
+                      <Button variant="secondary" className="mx-auto" onClick={handleButtonClick}>
                         {fileName ? fileName : 'Select CFG File'}
                       </Button>
                       <p className="mt-2 text-sm text-gray-400">
@@ -118,7 +136,7 @@ export default function Dashboard() {
                       className="h-64 bg-gray-900/50 text-white font-mono text-sm"
                     />
                     <div className="flex justify-end space-x-4">
-                      <Button variant="default" onClick={handleSaveFile}>
+                      <Button variant="secondary" onClick={handleSaveFile}>
                         Save Config
                       </Button>
                     </div>

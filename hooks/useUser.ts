@@ -10,6 +10,7 @@ type User = {
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -21,6 +22,7 @@ export function useUser() {
         localStorage.removeItem('token')
       }
     }
+    setIsLoading(false)
   }, [])
 
   const login = (token: string) => {
@@ -29,6 +31,7 @@ export function useUser() {
     if (decoded && decoded.payload) {
       setUser(decoded.payload)
     }
+    setIsLoading(false)
   }
 
   const logout = () => {
@@ -36,6 +39,6 @@ export function useUser() {
     setUser(null)
   }
 
-  return { user, login, logout }
+  return { user, isLoading, login, logout }
 }
 
