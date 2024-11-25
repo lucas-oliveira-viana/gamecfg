@@ -8,8 +8,10 @@ import { Input } from '@/components/ui/input'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Clipboard } from 'lucide-react'
 import Image from 'next/image'
+import { useUser } from '@/hooks/useUser'
 
 export function ConfigUploaderHome() {
+  const { user } = useUser()
   const [configInfo, setConfigInfo] = useState<string | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
   const [configLink, setConfigLink] = useState<string | null>(null)
@@ -30,9 +32,10 @@ export function ConfigUploaderHome() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
             },
             body: JSON.stringify({
-              userId: 'temp-user-id', // Replace with actual user ID when authentication is implemented
+              userId: user ? user.id : null,
               cfgContent: content,
               fileName: file.name,
             }),
@@ -95,7 +98,7 @@ export function ConfigUploaderHome() {
                 id="config-upload-home"
                 ref={fileInputRef}
               />
-              <Button variant="default" className="mx-auto" onClick={handleButtonClick}>
+              <Button variant="secondary" className="mx-auto" onClick={handleButtonClick}>
                 {fileName ? fileName : 'Select CFG File'}
               </Button>
               <p className="mt-2 text-sm text-gray-400">
@@ -141,15 +144,17 @@ export function ConfigUploaderHome() {
                   </Tooltip>
                 </TooltipProvider>
               )}
-              <Button className="w-full flex items-center justify-center space-x-2 bg-white hover:bg-gray-100 text-black">
-                <Image 
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/steam-icon-Qdmya1DG25syk2fFWNZwdTWcNFkFeZ.png"
-                  alt="Steam logo"
-                  width={24}
-                  height={24}
-                />
-                <span>Sign in with Steam to save config permanently</span>
-              </Button>
+              {!user && (
+                <Button className="w-full flex items-center justify-center space-x-2 bg-white hover:bg-gray-100 text-black">
+                  <Image 
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/steam-icon-Qdmya1DG25syk2fFWNZwdTWcNFkFeZ.png"
+                    alt="Steam logo"
+                    width={24}
+                    height={24}
+                  />
+                  <span>Sign in with Steam to save config permanently</span>
+                </Button>
+              )}
             </div>
           </div>
         )}

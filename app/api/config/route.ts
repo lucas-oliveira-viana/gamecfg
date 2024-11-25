@@ -1,39 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '../../../lib/supabase'
 import crypto from 'crypto'
+import { verifyToken } from '@/utils/jwt'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const linkIdentifier = searchParams.get('link_identifier')
-  console.log('GET request received for link_identifier:', linkIdentifier)
   return await fetchConfig(linkIdentifier)
 }
 
 export async function POST(request: NextRequest) {
-  const { userId, cfgContent, fileName } = await request.json()
-  console.log('POST request received for user:', userId)
+  const body = await request.json()
+  const { link_identifier, userId, cfgContent, fileName } = body
 
-  if (!userId || !cfgContent || !fileName) {
+  if (link_identifier) {
+    return await fetchConfig(link_identifier)
+  }
+
+  if (!cfgContent || !fileName) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
+  let authenticatedUserId = null
+  const authHeader = request.headers.get('Authorization')
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1]
+    const decoded = verifyToken(token)
+    if (decoded && decoded.payload) {
+      authenticatedUserId = decoded.payload.id
+    }
+  }
+
+  // Use authenticated user ID if available, otherwise use the provided userId (which might be null)
+  const finalUserId = authenticatedUserId || userId
+
   try {
-    const linkIdentifier = crypto.randomUUID()
+    const newLinkIdentifier = crypto.randomUUID()
     const { data, error } = await supabase
       .from('configs')
       .insert({
-        user_id: userId,
+        user_id: finalUserId,
         game: 'CS2',
         content: cfgContent,
         file_name: fileName,
-        link_identifier: linkIdentifier,
+        link_identifier: newLinkIdentifier,
+        is_public: finalUserId === null, // Set public if no user is associated
       })
       .select()
 
     if (error) throw error
 
     const insertedConfig = data[0]
-    console.log('Config saved successfully:', insertedConfig.link_identifier)
 
     return NextResponse.json({ message: 'CFG saved successfully', cfgId: insertedConfig.link_identifier }, { status: 200 })
   } catch (error) {
@@ -43,8 +60,6 @@ export async function POST(request: NextRequest) {
 }
 
 async function fetchConfig(linkIdentifier: string | null) {
-  console.log('Fetching config for link_identifier:', linkIdentifier)
-
   if (!linkIdentifier) {
     return NextResponse.json({ error: 'Missing link_identifier parameter' }, { status: 400 })
   }
@@ -66,7 +81,6 @@ async function fetchConfig(linkIdentifier: string | null) {
       return NextResponse.json({ error: 'Config not found' }, { status: 404 })
     }
 
-    console.log('Config found:', data.file_name)
     return NextResponse.json(data)
   } catch (error) {
     console.error('Unexpected error:', error)
