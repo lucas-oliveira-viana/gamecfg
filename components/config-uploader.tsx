@@ -16,7 +16,7 @@ export function ConfigUploader() {
       setFileName(file.name)
       const reader = new FileReader()
       reader.onload = (e) => {
-        const content = e.target.result as string
+        const content = e.target?.result as string
         setConfigInfo(content)
       }
       reader.readAsText(file)

@@ -20,7 +20,7 @@ export async function GET() {
 
     if (error) throw error;
 
-    const formattedData = data.map((cfg) => ({
+    const formattedData = data.map((cfg: any) => ({
       id: cfg.id,
       file_name: cfg.file_name,
       link_identifier: cfg.link_identifier,
