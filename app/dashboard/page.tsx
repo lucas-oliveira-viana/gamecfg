@@ -98,7 +98,8 @@ export default function Dashboard() {
             <CFGList userId={user.id} />
             <Card className="mt-8 bg-black border-gray-700">
               <CardHeader>
-                <CardTitle className="text-2xl text-white">
+                <CardTitle className="text-2xl
+text-white">
                   Upload New CFG
                 </CardTitle>
               </CardHeader>
@@ -114,7 +115,7 @@ export default function Dashboard() {
                         id="config-upload"
                         ref={fileInputRef}
                       />
-                      <Button variant="secondary" className="mx-auto" onClick={handleButtonClick}>
+                      <Button variant="default" className="mx-auto" onClick={handleButtonClick}>
                         {fileName ? fileName : 'Select CFG File'}
                       </Button>
                       <p className="mt-2 text-sm text-gray-400">
@@ -136,7 +137,7 @@ export default function Dashboard() {
                       className="h-64 bg-gray-900/50 text-white font-mono text-sm"
                     />
                     <div className="flex justify-end space-x-4">
-                      <Button variant="secondary" onClick={handleSaveFile}>
+                      <Button variant="default" onClick={handleSaveFile}>
                         Save Config
                       </Button>
                     </div>
