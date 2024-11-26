@@ -58,9 +58,9 @@ export function Header() {
   )
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm border-b border-white/10">
-      <div className="container mx-auto">
-        <div className="flex h-16 items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm border-b border-white/10 h-16">
+      <div className="container mx-auto h-full">
+        <div className="flex h-full items-center justify-between">
           <div className="flex items-center space-x-4 md:space-x-8">
             <Link href="/" className="text-xl font-bold flex items-center gap-2">
               <Settings className="w-6 h-6" />
@@ -95,14 +95,14 @@ export function Header() {
                     <span className="text-white">{user.username}</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem asChild>
+                <DropdownMenuContent className="w-56 bg-black" align="end">
+                  <DropdownMenuItem asChild className='cursor-pointer'>
                     <Link href="/dashboard" className="flex items-center">
                       <User className="mr-2 h-4 w-4" />
                       <span>My Profile</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem className='cursor-pointer' onClick={handleLogout}>
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
