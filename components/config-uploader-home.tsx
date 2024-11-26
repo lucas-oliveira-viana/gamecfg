@@ -137,7 +137,7 @@ export function ConfigUploaderHome() {
                 id="config-upload-home"
                 ref={fileInputRef}
               />
-              <Button variant="default" className="mx-auto" onClick={handleButtonClick}>
+              <Button className="mx-auto" onClick={handleButtonClick}>
                 {fileName ? fileName : 'Select CFG File'}
               </Button>
               <p className="mt-2 text-sm text-gray-400">
