@@ -9,10 +9,22 @@ import Link from 'next/link'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Download } from 'lucide-react'
+import { CS2KeyBindings } from '@/components/cs2-key-bindings'
+import { CS2MouseBindings } from '@/components/cs2-mouse-bindings'
 
 type Config = {
   file_name: string
   content: string
+}
+
+type KeyBinding = {
+  key: string
+  command: string
+}
+
+type MouseBinding = {
+  button: string
+  command: string
 }
 
 export default function ConfigPage() {
@@ -21,6 +33,8 @@ export default function ConfigPage() {
   const [config, setConfig] = useState<Config | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [keyBindings, setKeyBindings] = useState<KeyBinding[]>([])
+  const [mouseBindings, setMouseBindings] = useState<MouseBinding[]>([])
 
   const fetchConfig = useCallback(async () => {
     if (!uuid) {
@@ -52,6 +66,7 @@ export default function ConfigPage() {
       const data = await response.json()
       console.log('Fetched config data:', data)
       setConfig(data)
+      parseBindings(data.content)
     } catch (err) {
       console.error('Error fetching config:', err)
       setError('Failed to load configuration. Please try again.')
@@ -64,6 +79,28 @@ export default function ConfigPage() {
     console.log('ConfigPage mounted, UUID:', uuid)
     fetchConfig()
   }, [fetchConfig])
+
+  const parseBindings = (content: string) => {
+    const bindRegex = /^bind\s+"(.+)"\s+"(.+)"$/gm
+    const keyBindings: KeyBinding[] = []
+    const mouseBindings: MouseBinding[] = []
+    let match
+
+    while ((match = bindRegex.exec(content)) !== null) {
+      const [, key, command] = match
+      if (key.toLowerCase().startsWith('mouse')) {
+        mouseBindings.push({ button: key, command })
+      } else {
+        keyBindings.push({ key, command })
+      }
+    }
+
+    setKeyBindings(keyBindings)
+    setMouseBindings(mouseBindings)
+    
+    console.log('Parsed key bindings:', keyBindings)
+    console.log('Parsed mouse bindings:', mouseBindings)
+  }
 
   const handleTryAgain = () => {
     console.log('Trying again...')
@@ -108,25 +145,38 @@ export default function ConfigPage() {
     }
 
     return (
-      <div className="flex-grow flex items-center justify-center p-4">
-        <Card className="w-full max-w-3xl bg-black border-gray-700">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-2xl text-white">
-              Configuration: {config.file_name}
-            </CardTitle>
-            <Button onClick={handleDownload} className="flex items-center gap-2">
-              <Download className="w-4 h-4" />
-              Download CFG
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              value={config.content}
-              readOnly
-              className="h-[60vh] bg-gray-900/50 text-white font-mono text-sm"
-            />
-          </CardContent>
-        </Card>
+      <div className="container mx-auto py-8">
+        <div className="flex flex-wrap gap-8">
+          <Card className="w-full bg-black border-gray-800">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-2xl text-white">
+                Configuration: {config.file_name}
+              </CardTitle>
+              <Button onClick={handleDownload} className="flex items-center gap-2">
+                <Download className="w-4 h-4" />
+                Download CFG
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                value={config.content}
+                readOnly
+                className="h-[40vh] bg-gray-900 text-white font-mono text-sm"
+              />
+            </CardContent>
+          </Card>
+          <Card className="w-full bg-black border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-2xl text-white">CS2 Bindings Visualization</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-8">
+                <CS2KeyBindings bindings={keyBindings} />
+                <CS2MouseBindings bindings={mouseBindings} />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     )
   }
