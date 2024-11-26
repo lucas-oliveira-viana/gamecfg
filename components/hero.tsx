@@ -29,11 +29,24 @@ export function Hero() {
   }
 
   return (
-    <div className="relative min-h-[100dvh] flex items-center justify-center pt-20 pb-32 md:pt-32 md:pb-40 container mx-auto px-4">
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-orange-500 to-green-500 opacity-20 mt-24 mb-12 rounded-lg" />
-      <div className="relative">
+    <div className="relative min-h-[100dvh] flex items-center justify-center pt-20 pb-32 md:pt-32 md:pb-40">
+      <div className="absolute inset-0 overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover scale-110 filter blur-sm"
+          aria-hidden="true"
+        >
+          <source src="https://sgthcgbnngkjolcnmxdv.supabase.co/storage/v1/object/public/gamecfg_bucket/9070174-uhd_3840_2160_25fps.mp4?t=2024-11-26T18%3A55%3A05.146Z" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+      <div className="relative z-10 container mx-auto px-4">
         <div className="text-center space-y-8">
-          <h1 className="text-4xl md:text-7xl font-bold tracking-tight min-h-[1.2em] relative">
+          <h1 className="text-4xl md:text-7xl font-bold tracking-tight min-h-[1.2em] relative text-white">
             {displayText}
             <span className={`inline-block w-[0.05em] h-[1.2em] bg-white ml-1 ${showCursor ? 'opacity-100' : 'opacity-0'}`}></span>
           </h1>
@@ -42,11 +55,11 @@ export function Hero() {
             Sign in to upload and manage your configs.
           </p>
           <div className="flex justify-center space-x-4">
-            <Button variant="default" size="lg" className="hover:bg-gray-100" onClick={handleUploadCFG}>
+            <Button variant="default" size="lg" className="bg-white text-black hover:bg-gray-100" onClick={handleUploadCFG}>
               <Upload className="w-5 h-5 mr-2" />
               Upload your CFG
             </Button>
-            <Button variant="outline" size="lg" asChild>
+            <Button variant="outline" size="lg" asChild className="bg-transparent text-white border-white hover:bg-white hover:text-black">
               <Link href="/explore">
                 <Compass className="w-5 h-5 mr-2" />
                 Explore public CFGs
