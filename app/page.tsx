@@ -8,7 +8,7 @@ export default function Home() {
     <div className="min-h-screen bg-black text-white">
       <Header />
       <Hero />
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 pt-8 pb-16">
         <div id="config-upload-section">
           <ConfigUploaderHome />
         </div>
