@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
             { 
               steam_id: steamUser.steamid, 
               username: steamUser.username,
-              avatar: steamUser.avatar
+              avatar: steamUser.avatar.small
             }
           ])
           .single()
@@ -48,7 +48,8 @@ export async function GET(request: NextRequest) {
       const token = generateToken({
         id: existingUser.id,
         steamid: existingUser.steam_id,
-        username: existingUser.username
+        username: existingUser.username,
+        avatar: JSON.parse(existingUser.avatar)
       })
 
       const redirectUrl = new URL('/dashboard', process.env.NEXT_PUBLIC_APP_URL)

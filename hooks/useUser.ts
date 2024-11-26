@@ -1,44 +1,45 @@
-import { useState, useEffect } from 'react'
-import { verifyToken } from '@/utils/jwt'
+import { useState, useEffect } from "react";
+import { verifyToken } from "@/utils/jwt";
 
 type User = {
-  id: number
-  steamid: string
-  username: string
-  avatar?: string
-}
+  id: number;
+  steamid: string;
+  username: string;
+  avatar?: {
+    small: string;
+  };
+};
 
 export function useUser() {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem("token");
     if (token) {
-      const decoded = verifyToken(token)
+      const decoded = verifyToken(token);
       if (decoded && decoded.payload) {
-        setUser(decoded.payload)
+        setUser(decoded.payload);
       } else {
-        localStorage.removeItem('token')
+        localStorage.removeItem("token");
       }
     }
-    setIsLoading(false)
-  }, [])
+    setIsLoading(false);
+  }, []);
 
   const login = (token: string) => {
-    localStorage.setItem('token', token)
-    const decoded = verifyToken(token)
+    localStorage.setItem("token", token);
+    const decoded = verifyToken(token);
     if (decoded && decoded.payload) {
-      setUser(decoded.payload)
+      setUser(decoded.payload);
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   const logout = () => {
-    localStorage.removeItem('token')
-    setUser(null)
-  }
+    localStorage.removeItem("token");
+    setUser(null);
+  };
 
-  return { user, isLoading, login, logout }
+  return { user, isLoading, login, logout };
 }
-

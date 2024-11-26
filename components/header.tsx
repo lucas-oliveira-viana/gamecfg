@@ -89,7 +89,7 @@ export function Header() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="hidden md:flex items-center space-x-2 hover:bg-transparent transition-colors">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar} alt={user.username} />
+                      <AvatarImage src={user.avatar?.small} alt={user.username} />
                       <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
                     </Avatar>
                     <span className="text-white">{user.username}</span>
@@ -135,7 +135,7 @@ export function Header() {
                     <div className="space-y-4">
                       <div className="flex items-center space-x-2">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={user.avatar} alt={user.username} />
+                          <AvatarImage src={user.avatar?.small} alt={user.username} />
                           <AvatarFallback>{user.username.slice(0, 2)}</AvatarFallback>
                         </Avatar>
                         <span className="text-white">{user.username}</span>
