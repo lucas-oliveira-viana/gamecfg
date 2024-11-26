@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useUser } from '@/hooks/useUser'
 import { CFGList } from '@/components/cfg-list'
 import { Loader2 } from 'lucide-react'
+import { Toaster } from '@/components/ui/toaster'
 
 export default function Dashboard() {
   const { user, isLoading } = useUser()
@@ -98,8 +99,7 @@ export default function Dashboard() {
             <CFGList userId={user.id} />
             <Card className="mt-8 bg-black border-gray-700">
               <CardHeader>
-                <CardTitle className="text-2xl
-text-white">
+                <CardTitle className="text-2xl text-white">
                   Upload New CFG
                 </CardTitle>
               </CardHeader>
@@ -115,7 +115,7 @@ text-white">
                         id="config-upload"
                         ref={fileInputRef}
                       />
-                      <Button variant="default" className="mx-auto" onClick={handleButtonClick}>
+                      <Button variant="secondary" className="mx-auto" onClick={handleButtonClick}>
                         {fileName ? fileName : 'Select CFG File'}
                       </Button>
                       <p className="mt-2 text-sm text-gray-400">
@@ -137,7 +137,7 @@ text-white">
                       className="h-64 bg-gray-900/50 text-white font-mono text-sm"
                     />
                     <div className="flex justify-end space-x-4">
-                      <Button variant="default" onClick={handleSaveFile}>
+                      <Button variant="secondary" onClick={handleSaveFile}>
                         Save Config
                       </Button>
                     </div>
@@ -156,6 +156,7 @@ text-white">
         )}
       </main>
       <Footer />
+      <Toaster />
     </div>
   )
 }
