@@ -7,7 +7,7 @@ import { Upload, Compass } from 'lucide-react'
 import Link from 'next/link'
 
 export function Hero() {
-  const { displayText, isTypingComplete } = useTypewriter("Elevate Your Gameplay with CFG Share!")
+  const { displayText, isTypingComplete } = useTypewriter("Welcome to GAME.CFG!")
   const [showCursor, setShowCursor] = useState(true)
 
   useEffect(() => {
