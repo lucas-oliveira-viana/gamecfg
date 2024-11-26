@@ -8,6 +8,28 @@ import Link from 'next/link'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+type AvatarData = {
+  small: string
+  medium: string
+  large: string
+  animated: {
+    static: string
+    movie: string
+  }
+  frame: {
+    static: string | null
+    movie: string | null
+  }
+}
+
+type Creator = {
+  id: number
+  username: string
+  steam_id: string
+  avatar: string
+}
 
 type CFG = {
   id: number
@@ -15,6 +37,18 @@ type CFG = {
   link_identifier: string
   created_at: string
   is_public: boolean
+  creator: Creator
+}
+
+function getAvatarUrl(avatarJson: string | undefined): string | undefined {
+  if (!avatarJson) return undefined
+  try {
+    const avatarData: AvatarData = JSON.parse(avatarJson)
+    return avatarData.small
+  } catch (error) {
+    console.error('Error parsing avatar JSON:', error)
+    return undefined
+  }
 }
 
 export function CFGList({ userId }: { userId: number }) {
@@ -135,9 +169,20 @@ export function CFGList({ userId }: { userId: number }) {
           <ul className="space-y-4">
             {cfgs.map((cfg) => (
               <li key={cfg.id} className="flex items-center justify-between bg-gray-800 p-4 rounded-md">
-                <div>
-                  <h3 className="text-lg font-semibold text-white">{cfg.file_name}</h3>
-                  <p className="text-sm text-gray-400">Created: {new Date(cfg.created_at).toLocaleDateString()}</p>
+                <div className="flex items-center space-x-4">
+                  <Link href={`https://steamcommunity.com/profiles/${cfg.creator.steam_id}`} target="_blank" rel="noopener noreferrer">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={getAvatarUrl(cfg.creator.avatar)} alt={cfg.creator.username} />
+                      <AvatarFallback>{cfg.creator.username.slice(0, 2)}</AvatarFallback>
+                    </Avatar>
+                  </Link>
+                  <div>
+                    <Link href={`https://steamcommunity.com/profiles/${cfg.creator.steam_id}`} target="_blank" rel="noopener noreferrer">
+                      <h3 className="text-lg font-semibold text-white hover:underline">{cfg.creator.username}</h3>
+                    </Link>
+                    <p className="text-sm text-gray-400">{cfg.file_name}</p>
+                    <p className="text-xs text-gray-500">Created: {new Date(cfg.created_at).toLocaleDateString()}</p>
+                  </div>
                 </div>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">

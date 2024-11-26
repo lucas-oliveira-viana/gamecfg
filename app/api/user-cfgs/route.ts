@@ -24,13 +24,30 @@ export async function GET(request: NextRequest) {
   try {
     const { data, error } = await supabase
       .from('configs')
-      .select('id, file_name, link_identifier, created_at, is_public')
+      .select(`
+        id, 
+        file_name, 
+        link_identifier, 
+        created_at, 
+        is_public,
+        users (
+          id,
+          username,
+          steam_id,
+          avatar
+        )
+      `)
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
     if (error) throw error
 
-    return NextResponse.json(data)
+    const formattedData = data.map(cfg => ({
+      ...cfg,
+      creator: cfg.users
+    }))
+
+    return NextResponse.json(formattedData)
   } catch (error) {
     console.error('Error fetching user CFGs:', error)
     return NextResponse.json({ error: 'Error fetching CFGs' }, { status: 500 })
