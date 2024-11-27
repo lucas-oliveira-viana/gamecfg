@@ -8,10 +8,12 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { Download } from 'lucide-react'
+import { Download, Copy, Check } from 'lucide-react'
 import { CS2KeyBindings } from '@/components/cs2-key-bindings'
 import { CS2MouseBindings } from '@/components/cs2-mouse-bindings'
+import { ConfigCategories } from '@/components/config-categories'
 import FlickeringGrid from "@/components/ui/flickering-grid"
+import { useToast } from "@/components/ui/use-toast"
 
 type Config = {
   file_name: string
@@ -36,6 +38,8 @@ export default function ConfigPage() {
   const [error, setError] = useState<string | null>(null)
   const [keyBindings, setKeyBindings] = useState<KeyBinding[]>([])
   const [mouseBindings, setMouseBindings] = useState<MouseBinding[]>([])
+  const [isCopied, setIsCopied] = useState(false)
+  const { toast } = useToast()
 
   const fetchConfig = useCallback(async () => {
     if (!uuid) {
@@ -122,6 +126,26 @@ export default function ConfigPage() {
     }
   }
 
+  const handleCopyContent = () => {
+    if (config) {
+      navigator.clipboard.writeText(config.content).then(() => {
+        setIsCopied(true)
+        toast({
+          title: "Copied!",
+          description: "Configuration content has been copied to clipboard.",
+        })
+        setTimeout(() => setIsCopied(false), 2000)
+      }).catch((err) => {
+        console.error('Failed to copy: ', err)
+        toast({
+          title: "Error",
+          description: "Failed to copy configuration content.",
+          variant: "destructive",
+        })
+      })
+    }
+  }
+
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -147,16 +171,22 @@ export default function ConfigPage() {
 
     return (
       <div className="container mx-auto py-8">
-        <div className="flex flex-wrap gap-8">
+        <div className="space-y-8">
           <Card className="w-full bg-background border-0">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-2xl text-white">
                 Configuration: {config.file_name}
               </CardTitle>
-              <Button onClick={handleDownload} className="flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                Download CFG
-              </Button>
+              <div className="flex space-x-2">
+                <Button onClick={handleCopyContent} className="flex items-center gap-2">
+                  {isCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {isCopied ? 'Copied' : 'Copy All'}
+                </Button>
+                <Button onClick={handleDownload} className="flex items-center gap-2">
+                  <Download className="w-4 h-4" />
+                  Download CFG
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <Textarea
@@ -166,6 +196,16 @@ export default function ConfigPage() {
               />
             </CardContent>
           </Card>
+
+          <Card className="w-full bg-background border-0">
+            <CardHeader>
+              <CardTitle className="text-2xl text-white">Configuration Categories</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ConfigCategories content={config.content} />
+            </CardContent>
+          </Card>
+
           <Card className="w-full bg-background border-0">
             <CardHeader>
               <CardTitle className="text-2xl text-white">CS2 Bindings Visualization</CardTitle>
