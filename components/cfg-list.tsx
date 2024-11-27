@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Loader2, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Trash2, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { useToast } from "@/components/ui/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type AvatarData = {
   small: string
@@ -141,8 +142,27 @@ export function CFGList({ userId }: { userId: number }) {
   if (isLoading) {
     return (
       <Card className="mt-4 bg-background border-0">
-        <CardContent className="pt-6 flex justify-center items-center">
-          <Loader2 className="h-6 w-6 animate-spin" />
+        <CardHeader>
+          <CardTitle className="text-2xl text-white">Your CFGs</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {[1, 2, 3].map((index) => (
+            <div key={index} className="mb-4 p-4 border border-gray-700 rounded-md">
+              <div className="flex items-center mb-2">
+                <Skeleton className="h-6 w-6 rounded-full mr-2" />
+                <Skeleton className="h-4 w-1/4" />
+              </div>
+              <Skeleton className="h-4 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-1/2 mb-4" />
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-6 w-16" />
+                <div>
+                  <Skeleton className="h-8 w-16 inline-block mr-2" />
+                  <Skeleton className="h-8 w-8 inline-block" />
+                </div>
+              </div>
+            </div>
+          ))}
         </CardContent>
       </Card>
     )

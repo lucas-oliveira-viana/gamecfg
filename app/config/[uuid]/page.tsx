@@ -14,6 +14,7 @@ import { CS2MouseBindings } from '@/components/cs2-mouse-bindings'
 import { ConfigCategories } from '@/components/config-categories'
 import FlickeringGrid from "@/components/ui/flickering-grid"
 import { useToast } from "@/components/ui/use-toast"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type Config = {
   file_name: string
@@ -149,8 +150,53 @@ export default function ConfigPage() {
   const renderContent = () => {
     if (isLoading) {
       return (
-        <div className="flex-grow flex items-center justify-center">
-          <p className="text-xl">Loading configuration...</p>
+        <div className="container mx-auto py-8">
+          <div className="space-y-8">
+            <Card className="w-full bg-background border-0">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <Skeleton className="h-8 w-64" />
+                <div className="flex space-x-2">
+                  <Skeleton className="h-10 w-24" />
+                  <Skeleton className="h-10 w-32" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-[40vh] w-full" />
+              </CardContent>
+            </Card>
+
+            <Card className="w-full bg-background border-0">
+              <CardHeader>
+                <Skeleton className="h-8 w-48" />
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {[1, 2, 3, 4].map((index) => (
+                    <Card key={index} className="bg-background border-0">
+                      <CardHeader>
+                        <Skeleton className="h-6 w-32" />
+                      </CardHeader>
+                      <CardContent>
+                        <Skeleton className="h-32 w-full" />
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="w-full bg-background border-0">
+              <CardHeader>
+                <Skeleton className="h-8 w-64" />
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-8">
+                  <Skeleton className="h-64 w-full md:w-[calc(50%-1rem)]" />
+                  <Skeleton className="h-64 w-full md:w-[calc(50%-1rem)]" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )
     }
