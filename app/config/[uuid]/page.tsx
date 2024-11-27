@@ -11,6 +11,7 @@ import { Footer } from '@/components/footer'
 import { Download } from 'lucide-react'
 import { CS2KeyBindings } from '@/components/cs2-key-bindings'
 import { CS2MouseBindings } from '@/components/cs2-mouse-bindings'
+import FlickeringGrid from "@/components/ui/flickering-grid"
 
 type Config = {
   file_name: string
@@ -147,7 +148,7 @@ export default function ConfigPage() {
     return (
       <div className="container mx-auto py-8">
         <div className="flex flex-wrap gap-8">
-          <Card className="w-full bg-black border-gray-800">
+          <Card className="w-full bg-background border-0">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-2xl text-white">
                 Configuration: {config.file_name}
@@ -165,7 +166,7 @@ export default function ConfigPage() {
               />
             </CardContent>
           </Card>
-          <Card className="w-full bg-black border-gray-800">
+          <Card className="w-full bg-background border-0">
             <CardHeader>
               <CardTitle className="text-2xl text-white">CS2 Bindings Visualization</CardTitle>
             </CardHeader>
@@ -182,12 +183,15 @@ export default function ConfigPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
-      <Header />
-      <main className="flex-grow flex flex-col mt-16">
-        {renderContent()}
-      </main>
-      <Footer />
+    <div className="min-h-screen bg-black text-white flex flex-col relative overflow-hidden">
+      <FlickeringGrid className="absolute inset-0 z-0" color="#6B7280" />
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow flex flex-col mt-16">
+          {renderContent()}
+        </main>
+        <Footer />
+      </div>
     </div>
   )
 }

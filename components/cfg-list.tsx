@@ -7,7 +7,7 @@ import { Loader2, Trash2, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
-import { toast } from '@/components/ui/use-toast'
+import { useToast } from "@/components/ui/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 type AvatarData = {
@@ -55,6 +55,7 @@ export function CFGList({ userId }: { userId: number }) {
   const [cfgs, setCfgs] = useState<CFG[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     const fetchCFGs = async () => {
@@ -139,7 +140,7 @@ export function CFGList({ userId }: { userId: number }) {
 
   if (isLoading) {
     return (
-      <Card className="mt-4 bg-black border-gray-700">
+      <Card className="mt-4 bg-background border-0">
         <CardContent className="pt-6 flex justify-center items-center">
           <Loader2 className="h-6 w-6 animate-spin" />
         </CardContent>
@@ -149,7 +150,7 @@ export function CFGList({ userId }: { userId: number }) {
 
   if (error) {
     return (
-      <Card className="mt-4 bg-black border-gray-700">
+      <Card className="mt-4 bg-background border-0">
         <CardContent className="pt-6">
           <p className="text-red-500">{error}</p>
         </CardContent>
@@ -158,7 +159,7 @@ export function CFGList({ userId }: { userId: number }) {
   }
 
   return (
-    <Card className="mt-4 bg-black border-gray-700">
+    <Card className="mt-4 bg-background border-0">
       <CardHeader>
         <CardTitle className="text-2xl text-white">Your CFGs</CardTitle>
       </CardHeader>
@@ -168,7 +169,7 @@ export function CFGList({ userId }: { userId: number }) {
         ) : (
           <ul className="space-y-4">
             {cfgs.map((cfg) => (
-              <li key={cfg.id} className="bg-gray-800 rounded-md overflow-hidden">
+              <li key={cfg.id} className="bg-background rounded-md overflow-hidden border border-gray-700">
                 <div className="p-4">
                   <h3 className="text-xl font-bold text-white mb-2">{cfg.file_name}</h3>
                   <div className="flex items-center space-x-2 mb-2">

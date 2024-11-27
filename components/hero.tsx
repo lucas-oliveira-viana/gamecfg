@@ -30,20 +30,6 @@ export function Hero() {
 
   return (
     <div className="relative min-h-[100dvh] flex items-center justify-center pt-20 pb-32 md:pt-32 md:pb-40">
-      <div className="absolute inset-0 overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover scale-110 filter blur-sm"
-          aria-hidden="true"
-        >
-          <source src="https://sgthcgbnngkjolcnmxdv.supabase.co/storage/v1/object/public/gamecfg_bucket/9070174-uhd_3840_2160_25fps.mp4?t=2024-11-26T18%3A55%3A05.146Z" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-      </div>
-      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
       <div className="relative z-10 container mx-auto px-4">
         <div className="text-center space-y-8">
           <h1 className="text-4xl md:text-7xl font-bold tracking-tight min-h-[1.2em] relative text-white">
