@@ -50,4 +50,31 @@
 
 html body[data-scroll-locked] {
   margin-right: 0!important;
+  overflow-y: scroll!important;
+}
+
+/* Aplica estilos ao scrollbar */
+::-webkit-scrollbar {
+  width: 10px; /* Largura da barra */
+}
+
+::-webkit-scrollbar-track {
+  background: #2a2a2a; /* Fundo cinza bem escuro */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c4c4c4; /* Barra cinza claro */
+  border-radius: 5px; /* Bordas arredondadas */
+  transition: background 0.3s ease; /* Transição suave para hover */
+}
+
+/* Hover na barra */
+::-webkit-scrollbar-thumb:hover {
+  background: #ffffff; /* Barra mais clara no hover */
+}
+
+/* Estilo alternativo para navegadores com suporte a scrollbar-color */
+* {
+  scrollbar-color: #c4c4c4 #2a2a2a; /* Cor da barra e fundo */
+  scrollbar-width: thin; /* Reduz a largura */
 }
