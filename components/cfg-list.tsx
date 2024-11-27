@@ -168,44 +168,52 @@ export function CFGList({ userId }: { userId: number }) {
         ) : (
           <ul className="space-y-4">
             {cfgs.map((cfg) => (
-              <li key={cfg.id} className="flex items-center justify-between bg-gray-800 p-4 rounded-md">
-                <div className="flex items-center space-x-4">
-                  <Link href={`https://steamcommunity.com/profiles/${cfg.creator.steam_id}`} target="_blank" rel="noopener noreferrer">
-                    <Avatar className="h-10 w-10">
+              <li key={cfg.id} className="bg-gray-800 rounded-md overflow-hidden">
+                <div className="p-4">
+                  <h3 className="text-xl font-bold text-white mb-2">{cfg.file_name}</h3>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Avatar className="h-6 w-6">
                       <AvatarImage src={getAvatarUrl(cfg.creator.avatar)} alt={cfg.creator.username} />
                       <AvatarFallback>{cfg.creator.username.slice(0, 2)}</AvatarFallback>
                     </Avatar>
-                  </Link>
-                  <div>
-                    <Link href={`https://steamcommunity.com/profiles/${cfg.creator.steam_id}`} target="_blank" rel="noopener noreferrer">
-                      <h3 className="text-lg font-semibold text-white hover:underline">{cfg.creator.username}</h3>
-                    </Link>
-                    <p className="text-sm text-gray-400">{cfg.file_name}</p>
-                    <p className="text-xs text-gray-500">Created: {new Date(cfg.created_at).toLocaleDateString()}</p>
+                    <p className="text-sm text-gray-400">
+                      Created by:{' '}
+                      <Link 
+                        href={`https://steamcommunity.com/profiles/${cfg.creator.steam_id}`}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {cfg.creator.username}
+                      </Link>
+                    </p>
                   </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <Label htmlFor={`privacy-${cfg.id}`} className="text-sm text-gray-300 flex items-center">
-                      {cfg.is_public ? (
-                        <Eye className="h-4 w-4 inline-block mr-1" />
-                      ) : (
-                        <EyeOff className="h-4 w-4 inline-block mr-1" />
-                      )}
-                      {cfg.is_public ? 'Public' : 'Private'}
-                    </Label>
-                    <Switch
-                      id={`privacy-${cfg.id}`}
-                      checked={cfg.is_public}
-                      onCheckedChange={(isPublic) => handlePrivacyToggle(cfg.id, isPublic)}
-                    />
+                  <p className="text-sm text-gray-500 mb-4">Created: {new Date(cfg.created_at).toLocaleDateString()}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id={`privacy-${cfg.id}`}
+                        checked={cfg.is_public}
+                        onCheckedChange={(isPublic) => handlePrivacyToggle(cfg.id, isPublic)}
+                      />
+                      <Label htmlFor={`privacy-${cfg.id}`} className="text-sm text-gray-300 flex items-center">
+                        {cfg.is_public ? (
+                          <Eye className="h-4 w-4 inline-block mr-1" />
+                        ) : (
+                          <EyeOff className="h-4 w-4 inline-block mr-1" />
+                        )}
+                        {cfg.is_public ? 'Public' : 'Private'}
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/config/${cfg.link_identifier}`}>View</Link>
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleDelete(cfg.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/config/${cfg.link_identifier}`}>View</Link>
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDelete(cfg.id)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
                 </div>
               </li>
             ))}

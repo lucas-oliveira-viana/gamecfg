@@ -5,9 +5,16 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
+import { Loader2, SortAsc, SortDesc } from 'lucide-react'
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type AvatarData = {
   small: string
@@ -49,10 +56,13 @@ function getAvatarUrl(avatarJson: string | undefined): string | undefined {
   }
 }
 
+type SortOrder = 'newest' | 'oldest'
+
 export default function ExplorePage() {
   const [publicCFGs, setPublicCFGs] = useState<PublicCFG[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
 
   useEffect(() => {
     const fetchPublicCFGs = async () => {
@@ -73,11 +83,47 @@ export default function ExplorePage() {
     fetchPublicCFGs()
   }, [])
 
+  const sortedCFGs = [...publicCFGs].sort((a, b) => {
+    const dateA = new Date(a.created_at).getTime()
+    const dateB = new Date(b.created_at).getTime()
+    return sortOrder === 'newest' ? dateB - dateA : dateA - dateB
+  })
+
+  const handleSortChange = (value: string) => {
+    setSortOrder(value as SortOrder)
+  }
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6 mt-20">Explore Public CFGs</h1>
+        <div className="flex justify-between items-center mb-6 mt-20">
+          <h1 className="text-3xl font-bold">Explore Public CFGs</h1>
+          <div className="flex items-center space-x-2">
+            <label htmlFor="sort-order" className="text-sm font-medium">
+              Sort by:
+            </label>
+            <Select onValueChange={handleSortChange} defaultValue={sortOrder}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Sort order" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">
+                  <div className="flex items-center">
+                    <SortDesc className="mr-2 h-4 w-4" />
+                    Newest first
+                  </div>
+                </SelectItem>
+                <SelectItem value="oldest">
+                  <div className="flex items-center">
+                    <SortAsc className="mr-2 h-4 w-4" />
+                    Oldest first
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         {isLoading ? (
           <Card className="mt-4 bg-black border-gray-700">
             <CardContent className="pt-6 flex justify-center items-center">
@@ -92,22 +138,26 @@ export default function ExplorePage() {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {publicCFGs.map((cfg) => (
+            {sortedCFGs.map((cfg) => (
               <Card key={cfg.id} className="bg-gray-800 border-gray-700">
                 <CardHeader>
-                  <div className="flex items-center space-x-4">
-                    <Link href={cfg.creator.steam_id ? `https://steamcommunity.com/profiles/${cfg.creator.steam_id}` : '#'} target="_blank" rel="noopener noreferrer">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={getAvatarUrl(cfg.creator.avatar)} alt={cfg.creator.username} />
-                        <AvatarFallback>{cfg.creator.username.slice(0, 2)}</AvatarFallback>
-                      </Avatar>
-                    </Link>
-                    <div>
-                      <Link href={cfg.creator.steam_id ? `https://steamcommunity.com/profiles/${cfg.creator.steam_id}` : '#'} target="_blank" rel="noopener noreferrer">
-                        <CardTitle className="text-lg font-semibold hover:underline">{cfg.creator.username}</CardTitle>
+                  <CardTitle className="text-xl font-bold text-white">{cfg.file_name}</CardTitle>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={getAvatarUrl(cfg.creator.avatar)} alt={cfg.creator.username} />
+                      <AvatarFallback>{cfg.creator.username.slice(0, 2)}</AvatarFallback>
+                    </Avatar>
+                    <p className="text-sm text-gray-400">
+                      Created by:{' '}
+                      <Link 
+                        href={cfg.creator.steam_id ? `https://steamcommunity.com/profiles/${cfg.creator.steam_id}` : '#'} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {cfg.creator.username}
                       </Link>
-                      <p className="text-sm text-gray-400">{cfg.file_name}</p>
-                    </div>
+                    </p>
                   </div>
                 </CardHeader>
                 <CardContent>

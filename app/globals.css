@@ -50,5 +50,4 @@
 
 html body[data-scroll-locked] {
   margin-right: 0!important;
-  overflow-y: scroll!important;
 }
