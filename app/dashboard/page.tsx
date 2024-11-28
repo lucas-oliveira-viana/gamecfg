@@ -11,6 +11,7 @@ import { CFGList } from '@/components/cfg-list'
 import { Toaster } from '@/components/ui/toaster'
 import FlickeringGrid from "@/components/ui/flickering-grid"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function Dashboard() {
   const { user, isLoading } = useUser()
@@ -128,55 +129,66 @@ export default function Dashboard() {
     return (
       <>
         <h1 className="text-3xl font-bold mb-6">Welcome, {user.username}!</h1>
-        <CFGList userId={user.id} />
-        <Card className="mt-8 bg-background border-0">
-          <CardHeader>
-            <CardTitle className="text-2xl text-white">
-              Upload New CFG
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!configInfo ? (
-              <div className="space-y-6">
-                <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center">
-                  <input
-                    type="file"
-                    accept=".cfg"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="config-upload"
-                    ref={fileInputRef}
-                  />
-                  <Button variant="default" className="mx-auto" onClick={handleButtonClick}>
-                    {fileName ? fileName : 'Select CFG File'}
-                  </Button>
-                  <p className="mt-2 text-sm text-gray-400">
-                    or drag and drop your config file here
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-semibold text-white">{fileName}</h3>
-                  <Button variant="outline" size="sm" onClick={handleReset}>
-                    Upload Another
-                  </Button>
-                </div>
-                <Textarea 
-                  value={configInfo} 
-                  readOnly 
-                  className="h-64 bg-gray-900/50 text-white font-mono text-sm"
-                />
-                <div className="flex justify-end space-x-4">
-                  <Button variant="default" onClick={handleSaveFile}>
-                    Save Config
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <Tabs defaultValue="my-cfgs" className="w-full">
+          <TabsList>
+            <TabsTrigger value="my-cfgs">My CFGs</TabsTrigger>
+            <TabsTrigger value="favorite-cfgs">Favorite CFGs</TabsTrigger>
+          </TabsList>
+          <TabsContent value="my-cfgs">
+            <CFGList userId={user.id} />
+            <Card className="mt-8 bg-background border-0">
+              <CardHeader>
+                <CardTitle className="text-2xl text-white">
+                  Upload New CFG
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {!configInfo ? (
+                  <div className="space-y-6">
+                    <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center">
+                      <input
+                        type="file"
+                        accept=".cfg"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                        id="config-upload"
+                        ref={fileInputRef}
+                      />
+                      <Button variant="default" className="mx-auto" onClick={handleButtonClick}>
+                        {fileName ? fileName : 'Select CFG File'}
+                      </Button>
+                      <p className="mt-2 text-sm text-gray-400">
+                        or drag and drop your config file here
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-xl font-semibold text-white">{fileName}</h3>
+                      <Button variant="outline" size="sm" onClick={handleReset}>
+                        Upload Another
+                      </Button>
+                    </div>
+                    <Textarea 
+                      value={configInfo} 
+                      readOnly 
+                      className="h-64 bg-gray-900/50 text-white font-mono text-sm"
+                    />
+                    <div className="flex justify-end space-x-4">
+                      <Button variant="default" onClick={handleSaveFile}>
+                        Save Config
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="favorite-cfgs">
+            <CFGList userId={user.id} isFavorites={true} />
+          </TabsContent>
+        </Tabs>
       </>
     )
   }

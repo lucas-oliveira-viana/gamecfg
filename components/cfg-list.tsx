@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Trash2, Eye, EyeOff } from 'lucide-react'
+import { Trash2, Eye, EyeOff, Heart, User } from 'lucide-react'
 import Link from 'next/link'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
@@ -30,7 +30,7 @@ type Creator = {
   username: string
   steam_id: string
   avatar: string
-}
+} | null
 
 type CFG = {
   id: number
@@ -52,7 +52,7 @@ function getAvatarUrl(avatarJson: string | undefined): string | undefined {
   }
 }
 
-export function CFGList({ userId }: { userId: number }) {
+export function CFGList({ userId, isFavorites = false }: { userId: number, isFavorites?: boolean }) {
   const [cfgs, setCfgs] = useState<CFG[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -61,27 +61,33 @@ export function CFGList({ userId }: { userId: number }) {
   useEffect(() => {
     const fetchCFGs = async () => {
       try {
-        const response = await fetch(`/api/user-cfgs?userId=${userId}`, {
+        const endpoint = isFavorites ? '/api/favorite-cfgs' : '/api/user-cfgs'
+        const response = await fetch(`${endpoint}?userId=${userId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
         })
         if (!response.ok) {
-          throw new Error('Failed to fetch CFGs')
+          throw new Error(`Failed to fetch ${isFavorites ? 'favorite' : 'user'} CFGs`)
         }
         const data = await response.json()
         setCfgs(data)
       } catch (err) {
-        setError('Failed to load CFGs. Please try again.')
+        setError(`Failed to load ${isFavorites ? 'favorite' : 'user'} CFGs. Please try again.`)
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchCFGs()
-  }, [userId])
+  }, [userId, isFavorites])
 
   const handleDelete = async (cfgId: number) => {
+    if (isFavorites) {
+      await handleUnfavorite(cfgId)
+      return
+    }
+
     try {
       const response = await fetch(`/api/delete-cfg`, {
         method: 'DELETE',
@@ -110,6 +116,8 @@ export function CFGList({ userId }: { userId: number }) {
   }
 
   const handlePrivacyToggle = async (cfgId: number, isPublic: boolean) => {
+    if (isFavorites) return // Don't allow privacy changes for favorite CFGs
+
     try {
       const response = await fetch('/api/update-cfg-privacy', {
         method: 'POST',
@@ -139,11 +147,39 @@ export function CFGList({ userId }: { userId: number }) {
     }
   }
 
+  const handleUnfavorite = async (cfgId: number) => {
+    try {
+      const response = await fetch('/api/favorite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ cfgId, action: 'remove' })
+      })
+      if (!response.ok) {
+        throw new Error('Failed to unfavorite CFG')
+      }
+      setCfgs(cfgs.filter(cfg => cfg.id !== cfgId))
+      toast({
+        title: "Removed from Favorites",
+        description: "The CFG has been removed from your favorites.",
+      })
+    } catch (err) {
+      setError('Failed to remove CFG from favorites. Please try again.')
+      toast({
+        title: "Error",
+        description: "Failed to remove CFG from favorites. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
   if (isLoading) {
     return (
       <Card className="mt-4 bg-background border-0">
         <CardHeader>
-          <CardTitle className="text-2xl text-white">Your CFGs</CardTitle>
+          <CardTitle className="text-2xl text-white">{isFavorites ? 'Favorite CFGs' : 'Your CFGs'}</CardTitle>
         </CardHeader>
         <CardContent>
           {[1, 2, 3].map((index) => (
@@ -181,11 +217,11 @@ export function CFGList({ userId }: { userId: number }) {
   return (
     <Card className="mt-4 bg-background border-0">
       <CardHeader>
-        <CardTitle className="text-2xl text-white">Your CFGs</CardTitle>
+        <CardTitle className="text-2xl text-white">{isFavorites ? 'Favorite CFGs' : 'Your CFGs'}</CardTitle>
       </CardHeader>
       <CardContent>
         {cfgs.length === 0 ? (
-          <p className="text-gray-400">You haven't uploaded any CFGs yet.</p>
+          <p className="text-gray-400">{isFavorites ? "You haven't favorited any CFGs yet." : "You haven't uploaded any CFGs yet."}</p>
         ) : (
           <ul className="space-y-4">
             {cfgs.map((cfg) => (
@@ -194,44 +230,62 @@ export function CFGList({ userId }: { userId: number }) {
                   <h3 className="text-xl font-bold text-white mb-2">{cfg.file_name}</h3>
                   <div className="flex items-center space-x-2 mb-2">
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src={getAvatarUrl(cfg.creator.avatar)} alt={cfg.creator.username} />
-                      <AvatarFallback>{cfg.creator.username.slice(0, 2)}</AvatarFallback>
+                      {cfg.creator ? (
+                        <AvatarImage src={getAvatarUrl(cfg.creator.avatar)} alt={cfg.creator.username} />
+                      ) : (
+                        <User className="h-4 w-4" />
+                      )}
+                      <AvatarFallback>{cfg.creator ? cfg.creator.username.slice(0, 2) : 'AN'}</AvatarFallback>
                     </Avatar>
                     <p className="text-sm text-gray-400">
                       Created by:{' '}
-                      <Link 
-                        href={`https://steamcommunity.com/profiles/${cfg.creator.steam_id}`}
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="hover:underline"
-                      >
-                        {cfg.creator.username}
-                      </Link>
+                      {cfg.creator ? (
+                        <Link 
+                          href={`https://steamcommunity.com/profiles/${cfg.creator.steam_id}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                        >
+                          {cfg.creator.username}
+                        </Link>
+                      ) : (
+                        <span>Anonymous</span>
+                      )}
                     </p>
                   </div>
                   <p className="text-sm text-gray-500 mb-4">Created: {new Date(cfg.created_at).toLocaleDateString()}</p>
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id={`privacy-${cfg.id}`}
-                        checked={cfg.is_public}
-                        onCheckedChange={(isPublic) => handlePrivacyToggle(cfg.id, isPublic)}
-                      />
-                      <Label htmlFor={`privacy-${cfg.id}`} className="text-sm text-gray-300 flex items-center">
-                        {cfg.is_public ? (
-                          <Eye className="h-4 w-4 inline-block mr-1" />
-                        ) : (
-                          <EyeOff className="h-4 w-4 inline-block mr-1" />
-                        )}
-                        {cfg.is_public ? 'Public' : 'Private'}
-                      </Label>
-                    </div>
+                    {!isFavorites && (
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id={`privacy-${cfg.id}`}
+                          checked={cfg.is_public}
+                          onCheckedChange={(isPublic) => handlePrivacyToggle(cfg.id, isPublic)}
+                        />
+                        <Label htmlFor={`privacy-${cfg.id}`} className="text-sm text-gray-300 flex items-center">
+                          {cfg.is_public ? (
+                            <Eye className="h-4 w-4 inline-block mr-1" />
+                          ) : (
+                            <EyeOff className="h-4 w-4 inline-block mr-1" />
+                          )}
+                          {cfg.is_public ? 'Public' : 'Private'}
+                        </Label>
+                      </div>
+                    )}
                     <div className="flex items-center space-x-2">
                       <Button asChild variant="outline" size="sm">
                         <Link href={`/config/${cfg.link_identifier}`}>View</Link>
                       </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(cfg.id)}>
-                        <Trash2 className="h-4 w-4" />
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={() => handleDelete(cfg.id)}
+                      >
+                        {isFavorites ? (
+                          <Heart className="h-4 w-4" fill="currentColor" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
